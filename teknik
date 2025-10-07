@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Box Component</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 135, 135, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(138, 180, 248, 0.3) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) rotate(0deg); }
+      33% { transform: translate(30px, -50px) rotate(5deg); }
+      66% { transform: translate(-20px, 20px) rotate(-5deg); }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+
+    #chat-container {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      height: 650px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+        0 0 100px rgba(102, 126, 234, 0.4);
+      overflow: hidden;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    #chat-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #chat-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      animation: shimmer 3s infinite;
+    }
+
+    #chat-header h2 {
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1;
+      flex: 1;
+    }
+
+    #header-actions {
+      display: flex;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    .header-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .header-btn:active {
+      transform: scale(0.95);
+    }
+
+    #chat-box {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* ✅ ALTTA tutar */
+  gap: 12px;
+  padding: 20px;
+  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+  ...
+}
+
+    #chat-box::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #chat-box::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #667eea, #764ba2);
+      border-radius: 10px;
+    }
+
+   #chat-box {
+  flex: 1;
+  flex-direction: column; /* nickname ve mesajı alt alta koy */
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  word-wrap: break-word;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background: white;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+    #chat-box div::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #667eea, #764ba2);
+      border-radius: 16px 0 0 16px;
+    }
+
+    #chat-box div:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(102, 126, 234, 0.2);
+    }
+
+    .like-btn {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .like-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .like-btn:hover {
+      transform: scale(1.1) rotate(-5deg);
+      box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+    }
+
+    .like-btn:hover::before {
+      width: 100px;
+      height: 100px;
+    }
+
+    .like-btn:active {
+      transform: scale(0.95);
+    }
+
+    #chat-input-container {
+      padding: 20px;
+      background: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #chat-input {
+      flex: 1;
+      border: 2px solid #e9ecef;
+      border-radius: 16px;
+      padding: 14px 18px;
+      background: #f8f9fa;
+      color: #1a1a1a;
+      outline: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    #chat-input:focus {
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    #chat-input::placeholder {
+      color: #adb5bd;
+    }
+
+    #chat-send {
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #chat-send::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+      );
+      transition: left 0.5s;
+    }
+
+    #chat-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    #chat-send:hover::before {
+      left: 100%;
+    }
+
+    #chat-send:active {
+      transform: translateY(0);
+    }
+
+    #toggle-chat {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 9999;
+      padding: 14px 24px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #toggle-chat:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      #chat-container {
+        max-width: 100%;
+        height: 100vh;
+        border-radius: 0;
+      }
+
+      body {
+        padding: 0;
+      }
+
+      #toggle-chat {
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+
+    .typing-indicator {
+      display: none;
+      padding: 12px 16px;
+      align-items: center;
+      gap: 8px;
+      color: #667eea;
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+      display: inline-block;
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.7; }
+      30% { transform: translateY(-10px); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Chat Box Toggle Button -->
+  <button id="toggle-chat">💬 Sohbet</button>
+
+  <!-- Chat Container -->
+  <div id="chat-container">
+    <div id="chat-header">
+      <h2>💭 Canlı Sohbet</h2>
+      <div id="header-actions">
+        <button class="header-btn" id="clear-btn" title="Mesajları Temizle">🗑️</button>
+        <button class="header-btn" id="sound-btn" title="Sesleri Aç/Kapat">🔔</button>
+        <button class="header-btn" id="theme-btn" title="Tema Değiştir">🎨</button>
+      </div>
+    </div>
+    <div id="chat-box"></div>
+    <div class="typing-indicator">
+      Biri yazıyor<span></span><span></span><span></span>
+    </div>
+    <div id="chat-input-container">
+      <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." />
+      <button id="chat-send">📤</button>
+    </div>
+  </div>
+
+  <!-- Firebase ve Chat Scripti -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, push, onChildAdded, onChildChanged, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // Firebase Konfigürasyonu
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbwCl4dKOV7w9e1enR_pxG8GyNIbmzCNs",
+      authDomain: "cokluhaber-dc6ff.firebaseapp.com",
+      databaseURL: "https://cokluhaber-dc6ff-default-rtdb.firebaseio.com",
+      projectId: "cokluhaber-dc6ff",
+      storageBucket: "cokluhaber-dc6ff.firebasestorage.app",
+      messagingSenderId: "433806685700",
+      appId: "1:433806685700:web:4a83de01d82d48e36f2751",
+      measurementId: "G-6MGK6JXGYL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const chatRef = ref(db, 'deneme');
+
+    // Ses bildirimi fonksiyonu
+    let soundEnabled = localStorage.getItem("chat_sound") !== "false";
+    
+    function playNotificationSound() {
+      if (soundEnabled) {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUKnl8LNlHQU5k9n0zHgsBS1+zPLaizsKD1y48eyoVBUIQ5zd8sFuIwUuhM/z3Ik2CBtpvfDknE4MDlCp5fCzZR0FOZPa9M16LAUwfs7y2Ys5CQ9duvbtqFQVCEGb3PLBbyMFLoTP89yKNggcabzw5JxODA5Qqubws2UdBTmT2vTNfCwGMYDP8tqLOAkPXrry7atVFQlDnd3ywW0iBS2Dz/PeiTYIG2m88+SbTgwOUKvm8LRlHQU6k9n0zHosBS5+zfLZizgJEF67s+ynUhUJQpze8sBtIgUtg8/z3og2CBxpvPDkm04MDk+p5u+zZBwEOpPZ9M18LAYwf87y2Yo5CRFfvLPsp1IVCkCb3fPCbSIF'); 
+        audio.volume = 0.3;
+        audio.play().catch(() => {});
+      }
+    }
+
+    // Ses butonu
+    const soundBtn = document.getElementById("sound-btn");
+    soundBtn.textContent = soundEnabled ? "🔔" : "🔕";
+    
+    soundBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("chat_sound", soundEnabled);
+      soundBtn.textContent = soundEnabled ? "🔔" : "🔕";
+    });
+
+    // Mesajları temizle butonu
+    document.getElementById("clear-btn").addEventListener("click", () => {
+      if (confirm("Tüm mesajları temizlemek istediğinize emin misiniz?")) {
+        document.getElementById("chat-box").innerHTML = "";
+      }
+    });
+
+    // Tema değiştirme butonu
+    const themes = [
+      { primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+      { primary: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', bg: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
+      { primary: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+      { primary: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', bg: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' }
+    ];
+    
+    let currentTheme = 0;
+    
+    document.getElementById("theme-btn").addEventListener("click", () => {
+      currentTheme = (currentTheme + 1) % themes.length;
+      document.body.style.background = themes[currentTheme].bg;
+      document.getElementById("chat-header").style.background = themes[currentTheme].primary;
+      document.getElementById("chat-send").style.background = themes[currentTheme].primary;
+      document.getElementById("toggle-chat").style.background = themes[currentTheme].primary;
+    });
+    let nick = localStorage.getItem("chat_nick");
+
+    if (!nick) {
+      nick = prompt("Takma adınızı girin:");
+      if (nick) {
+        localStorage.setItem("chat_nick", nick);
+      } else {
+        nick = "Anonim"; 
+      }
+    }
+
+    // Enter ile Mesaj Gönderme
+    const chatInput = document.getElementById("chat-input");
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("chat-send").click();
+      }
+    });
+
+    // Mesaj Gönderme
+    document.getElementById("chat-send").addEventListener("click", () => {
+      const msgInput = document.getElementById("chat-input");
+      const text = msgInput.value.trim();
+      
+      const blacklist = ["http", "www", ".com", ".ru", "telegram", "@", "join", "subscribe"];
+      const tooFast = Date.now() - (window.lastMessageTime || 0) < 1000;
+
+      if (!text || text.length > 200 || tooFast || blacklist.some(word => text.toLowerCase().includes(word))) {
+        alert("Mesaj gönderilemedi. Spam şüphesi.");
+        return;
+      }
+
+      window.lastMessageTime = Date.now(); 
+
+      push(chatRef, { 
+        nick, 
+        text, 
+        time: Date.now(), 
+        likes: 0, 
+        likedBy: {}
+      });
+
+      msgInput.value = '';
+    });
+
+    // Renk Üretme Fonksiyonu
+    function getColorFromNick(nick) {
+      let hash = 0;
+      for (let i = 0; i < nick.length; i++) {
+        hash = nick.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const hue = Math.abs(hash % 360);
+      return `hsl(${hue}, 70%, 50%)`;
+    }
+
+    // Yeni Mesaj Geldiğinde
+    onChildAdded(chatRef, (snapshot) => {
+      const msg = snapshot.val();
+      const key = snapshot.key;
+      const box = document.getElementById("chat-box");
+
+      const el = document.createElement("div");
+      const nickColor = getColorFromNick(msg.nick);
+      const date = new Date(msg.time || Date.now());
+      const timeString = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+      el.innerHTML = `
+        <strong style="color:${nickColor}; font-weight:700;">${msg.nick}</strong> 
+        <span style="color:#6c757d; font-size:11px; font-weight:600; margin-left:6px;">
+          ${timeString}
+        </span>
+        <br>
+        <span style="margin-top:4px; display:inline-block;">${msg.text}</span>
+        <button class="like-btn" data-key="${key}">❤️ ${msg.likes || 0}</button>
+      `;
+
+      box.appendChild(el);
+box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });      
+      // Yeni mesaj sesi çal
+      if (msg.nick !== nick) {
+        playNotificationSound();
+      }
+
+      // Beğeni Butonu
+      const likeButton = el.querySelector(".like-btn");
+      const userId = localStorage.getItem("chat_nick") || "Anonim";
+
+      likeButton.addEventListener("click", () => {
+        const alreadyLiked = msg.likedBy && msg.likedBy[userId];
+
+        if (alreadyLiked) {
+          alert("Bu mesaja sadece bir kez beğeni atabilirsiniz.");
+          return;
+        }
+
+        const newLikes = (msg.likes || 0) + 1;
+        const updates = {};
+        updates[`deneme/${key}/likes`] = newLikes;
+        updates[`deneme/${key}/likedBy/${userId}`] = true;
+        update(ref(db), updates);
+      });
+    });
+
+    // Beğeni Sayısı Güncellendiğinde
+    onChildChanged(chatRef, (snapshot) => {
+      const msgKey = snapshot.key;
+      const msg = snapshot.val();
+      const btn = document.querySelector(`.like-btn[data-key="${msgKey}"]`);
+      if (btn) {
+        btn.innerHTML = `❤️ ${msg.likes || 0}`;
+      }
+    });
+
+    // Chat Görünürlük Toggle
+    const chatContainer = document.getElementById("chat-container");
+    const toggleButton = document.getElementById("toggle-chat");
+
+    toggleButton.addEventListener("click", () => {
+      if (chatContainer.style.display === "none") {
+        chatContainer.style.display = "flex";
+        toggleButton.textContent = "❌ Kapat";
+      } else {
+        chatContainer.style.display = "none";
+        toggleButton.textContent = "💬 Sohbet";
+      }
+    });
+  </script>
+
+</body>
+</html>
