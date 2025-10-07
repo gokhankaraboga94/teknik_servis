@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -150,17 +151,7 @@
       transform: scale(0.95);
     }
 
-    #chat-box {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end; /* ✅ ALTTA tutar */
-  gap: 12px;
-  padding: 20px;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
-  ...
-}
+
 
     #chat-box::-webkit-scrollbar {
       width: 6px;
@@ -184,10 +175,12 @@
   font-size: 14px;
   word-wrap: break-word;
   line-height: 1.5;
+    overflow-y: auto; /* ✅ Bu satırı ekle */
+
   color: #1a1a1a;
   background: white;
   position: relative;
-  overflow: hidden;
+ 
   animation: slideUp 0.3s ease-out;
   transition: all 0.3s ease;
   box-shadow: 
